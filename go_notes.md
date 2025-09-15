@@ -1,0 +1,75 @@
+in go there is one file in which we import package main, than file is the executable file
+
+basic syntax for executable file 
+```
+package main
+
+import {
+	"fmt"
+}
+
+func main(){
+}
+```
+
+go searches in this particular order for packages that is ->
+
+-> Standard library (GOROOT)
+-> Local project packages (module)
+-> External modules (from Go proxy or GitHub)
+
+Interfaces, slices, maps, channels → already act like references → no * needed for usual operations.
+
+Structs and arrays → copied by value → use * pointer for efficiency or mutability.
+
+Passing pointers → avoids copying and allows modification of original data.
+
+defining struct in go-> 
+```
+type Person struct {
+	Name string 
+	Age int 
+}
+```
+
+defining interface in go-> 
+```
+type Shape interface {
+	Area() float64
+	Perimeter() float64
+}
+
+type Rectangle struct{
+	Width, Height float64
+}
+
+func (r Rectangle) Area() float64{
+	return r.Width * r.Height
+}
+```
+
+ok so to call at any page i need to register with a mux, when i write 
+http.HandleFunc("/hello", Hello)
+it register Hello function with defaultmultipexer , i could also create a custom multiplexer
+``` mux := http.NewServeMux()
+    mux.HandleFunc("hello", Hello)
+	http.ListenAndServe(":8080", mux)
+```
+
+this is how i tell what will the json field be 
+```
+	ID string `json:"id"`
+```
+
+this is how i set the header of response 
+```
+w.Header().Set("Content-Type", "application/json")
+```
+
+this is how i take params 
+```
+params = mux.Vars(r);
+```
+
+
+
