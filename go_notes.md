@@ -71,5 +71,14 @@ this is how i take params
 params = mux.Vars(r);
 ```
 
+this is how i define a map
+```
+var m map[KeyType]ValueType
+```
+
+when calling function for [] slice i will pass &slicename because it will point to the header that's what i want 
+
+
+
 
 
