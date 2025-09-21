@@ -78,6 +78,21 @@ var m map[KeyType]ValueType
 
 when calling function for [] slice i will pass &slicename because it will point to the header that's what i want 
 
+in graphQL, we have two things one is query second is mutation, query is for get and mutation is for post, put delete update, in this we make a file schemaQL ( something like this ) and the package do the rest of the work
+
+in grpc we need to install 
+
+``` go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	winget install protobuf
+```
+
+and than first create file in something.proto in proto folder and run this to generate go files which will have all the functions created automatically
+```
+protoc --go_out=. --go-grpc_out=. proto/greet.proto
+```
+
+
 
 
 
