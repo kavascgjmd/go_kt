@@ -87,7 +87,7 @@ func UpdateMenu() gin.HandlerFunc{
 
 		var ctx , cancel = context.WithTimeout(context.Background(), 100*time.Second)
         var menu models.Menu
-		if err := c.BindJSON(&menu); err != nil{
+		err := c.BindJSON(&menu); if err != nil{
 			c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
 			return
 		}
@@ -104,19 +104,19 @@ func UpdateMenu() gin.HandlerFunc{
 				return
 			}
 
-			updateObj = append(updateObj, bson.E{"start_date", menu.Start_Date}) // bson.E is a type of struct of {key:string, value:interface{}}
-	        updateObj = append(updateObj, bson.E{"end_date", menu.End_Date})
+			updateObj = append(updateObj, bson.E{Key : "start_date",Value  : menu.Start_Date}) // bson.E is a type of struct of {key:string, value:interface{}}
+	        updateObj = append(updateObj, bson.E{Key : "end_date", Value : menu.End_Date})
 		}
 		if menu.Name != ""{
-			updateObj = append(updateObj, bson.E{"name",menu.Name})
+			updateObj = append(updateObj, bson.E{ Key : "name",Value :menu.Name})
 		}
 		if menu.Category != "" {
-			updateObj = append(updateObj, bson.E{"category", menu.Category})
+			updateObj = append(updateObj, bson.E{Key : "category", Value : menu.Category})
 		}
         t := time.Now();
 		menu.Updated_at = &t;
-        updateObj = append(updateObj, bson.E{"updated_at", menu.Updated_at});
-		upsert := true
+        updateObj = append(updateObj, bson.E{Key : "updated_at",Value : menu.Updated_at});
+		upsert := true // this is for if feild doesn't exist then create
 		opt := options.UpdateOptions{
 			Upsert: &upsert,
 		}
@@ -125,7 +125,7 @@ func UpdateMenu() gin.HandlerFunc{
 			ctx, 
 			filter,
 			bson.D{ // this is also a slice of bson.E
-				{"$set", updateObj}, // if i just pass updateObj than non-existing fields will be deleted 
+				{Key : "$set", Value : updateObj}, // if i just pass updateObj than non-existing fields will be deleted 
 			},
 			&opt,
 

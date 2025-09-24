@@ -5,12 +5,15 @@ import (
 	"log"
 	"net/http"
 	"restaurant-management/database"
+	"restaurant-management/models"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client , "food")
@@ -84,12 +87,70 @@ func GetFood() gin.HandlerFunc{
 
 func CreateFood() gin.HandlerFunc{
 	return func(c * gin.Context){
+      ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second);
+	  defer cancel()
+	  var food models.Food
+	  err := c.BindJSON(&food); if err != nil{
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	  }
+	  t := time.Now()
+	  food.Created_at = &t;
+      food.Updated_at = &t;
+	  food.ID = primitive.NewObjectID()
+	  food.Food_id = food.ID.Hex()
 
+	  result, err := foodCollection.InsertOne(ctx, food);
+	  if err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error":err.Error()})
+		return
+	  }
+      c.JSON(http.StatusOK, result);
 	}
 }
 
 func UpdateFood() gin.HandlerFunc{
 	return func(c * gin.Context){
+      var food models.Food;
+	   err := c.BindJSON(&food);if err  != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error" : err.Error()})
+		return 
+	  }
+      ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	  defer cancel()
+	  foodId := c.Query("food_id")
+	  var updateobj primitive.D
+	  if food.Food_image != nil{
+          updateobj = append(updateobj, bson.E{Key : "food_image", Value: food.Food_image })
+	  }
+      if food.Menu_id != nil{
+          updateobj= append(updateobj, bson.E{Key : "menu_id" , Value: food.Menu_id})
+	  }
+	  if food.Food_image != nil{
+          updateobj = append(updateobj, bson.E{Key: "food_image", Value: food.Food_image})
+	  }
+	  if food.Price != nil{
+          updateobj = append(updateobj, bson.E{Key : "price", Value: food.Price})
+	  }
+	  t := time.Now();
+	  food.Updated_at = &t;
+	  updateobj = append(updateobj, bson.E{Key: "updated_at", Value: food.Updated_at})
+      upsert := true 
+	  opt := options.UpdateOptions{
+		Upsert: &upsert,
+	  }
 
+	  result, err := foodCollection.UpdateOne(
+		ctx, bson.M{"food_id" : foodId} ,bson.D{
+			{
+				Key:"$set",Value:  updateobj,
+		}} , &opt,
+	  )
+
+	  if err != nil{
+		msg := "Food upation failed"
+		c.JSON(http.StatusInternalServerError, gin.H{"error":msg})
+	  }
+	  c.JSON(http.StatusOK, result);
 	}
 }
