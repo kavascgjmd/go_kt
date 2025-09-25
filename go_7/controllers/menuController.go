@@ -32,7 +32,7 @@ func GetMenus() gin.HandlerFunc{
 	if err = result.All(ctx, &allMenus); err != nil{ // result is mongo.Cursor so it need to be converted into something that is go, to be converted to json
 		log.Fatal(err)
 	}
-	c.JSON(http.StatusOK, allMenus)
+	c.JSON(http.StatusOK, &allMenus)
 	}
 }
 

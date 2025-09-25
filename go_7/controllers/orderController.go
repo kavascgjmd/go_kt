@@ -163,3 +163,18 @@ func UpdateOrder() gin.HandlerFunc{
 		
 	}
 }
+
+func CreateOrderbyOrderItem(order models.Order) (string, error) {
+	 ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	 defer cancel()
+     order.ID = primitive.NewObjectID()
+	 order.Order_id = order.ID.Hex()
+	 validateerr := validate.Struct(order); if validateerr != nil{
+		return "", validateerr
+	 }
+	 _, err := orderCollection.InsertOne(ctx, order);
+	 if err != nil{
+		return "", err
+	 }
+	 return order.Order_id, nil
+}
