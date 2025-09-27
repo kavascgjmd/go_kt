@@ -107,5 +107,7 @@ and than pass &book
 creating pointer and passing will cause problem like book *models.Book and than passing book because this 
 pointer dont point to anything 
 
+csrf cross site frogery it is like if someone like a site can make your browser make request to server, like evil.com is making request to abc.com than browser would send all your token automatically that could cause problem , to prevent that we have a csrf-token that in is js script, but it could also be compromised by xss-attack
+
 
 
